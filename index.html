@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To Do</title>
+    <link href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet'>
+    <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
+</head>
+<body>
+    <div class="content">
+    <h1>Чеклист</h1>
+    <ul>
+        {% for t in tasks %}
+            <li>
+                <input type="checkbox" id="task-{{loop.index}}" onchange="toggleTask(this, '{{loop.index}}')">
+                <label for="task-{{loop.index}}" id="label-{{loop.index}}">{{t}}</label>
+                <button class="delete-btn" id="delete-{{loop.index}}" onclick="deleteTask('{{loop.index}}')">Удалить</button>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <form method="post" action="/add">
+        <label for="newTask">Добавить задачу:</label>
+        <input type="text" id="newTask" name="newTask" required>
+        <button type="submit">Добавить</button>
+    </form>
+    </div>
+    <script>
+        
+        function toggleTask(checkbox, index) {
+            const label = document.getElementById(`label-${index}`);
+            const deleteBtn = document.getElementById(`delete-${index}`);
+
+            if (checkbox.checked) {
+                label.classList.add('completed'); 
+                deleteBtn.style.display = 'inline-block'; 
+            } else {
+                label.classList.remove('completed'); 
+                deleteBtn.style.display = 'none'; 
+            }
+        }
+        function deleteTask(index) {
+            fetch('/delete', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `taskCheckbox=${index}`
+            }).then(() => window.location.reload());
+        }
+    </script>
+</body>
+</html>
